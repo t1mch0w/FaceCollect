@@ -1,0 +1,68 @@
+import facebook4j.Comment;
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.PagableList;
+import facebook4j.Post;
+import facebook4j.Reading;
+import facebook4j.ResponseList;
+import facebook4j.auth.AccessToken;
+
+public class App {
+
+	/**
+	 * A simple Facebook4J client.
+	 * 
+	 * 
+	 * @param args
+	 * @throws FacebookException 
+	 */
+	public static void main(String[] args){
+
+	try {
+			// Generate facebook instance.
+			Facebook facebook = new FacebookFactory().getInstance();
+			// Use default values for oauth app id.
+			facebook.setOAuthAppId("618937894850468", "8dd5e2baad050240c8022f8928c3b27e");
+			// Get an access token from: 
+			// https://developers.facebook.com/tools/explorer
+			// Copy and paste it below.
+			String accessTokenString = "CAACEdEose0cBAOZAtZB3eMAz3i7WXAVrabZAlBxxiW7647zzUAjP1KfRRlGkpEjD8CDldN4ZAZC2NKrT74Doh2rbu8g8jyLx8KMTVdJLLw0AEaeLcSlSxuCsB1Sr3QuHAKBHKJ1D6EQ1beboawNN78uy7w2ZCyTJbyW7WfZB0BZBXLxYx6EIM9TFj2999I7CarAZD";
+			AccessToken at = new AccessToken(accessTokenString);
+			// Set access token.
+			facebook.setOAuthAccessToken(at);
+	
+			// We're done.
+			// Write some stuff to your wall.
+	
+			int k = Integer.parseInt(args[0]);
+	
+	//		System.out.println("From " + k + "To " + (k+50));
+			ResponseList<Post> feeds = facebook.getPosts("8103318119");
+			//											new Reading().limit(50).offset(k));
+	
+	//  		ResponseList<Post> feeds = facebook.getFeed("8103318119",
+	//  	     new Reading().limit(25));
+			for (int j = 0; j < 50; j++) {	
+	    		for (int i = 0; i < feeds.size(); i++) {
+	    		    // Get post.
+	    		    Post post = feeds.get(i);
+	    		    // Get (string) message.
+	    		    String message = post.getMessage();
+	    		                    // Print out the message.
+	    		    System.out.println(message);
+	
+	    		    // Get more stuff...
+	    		    PagableList<Comment> comments = post.getComments();
+	    		    String date = post.getCreatedTime().toString();
+	    		    String name = post.getFrom().getName();
+	    		    String id = post.getId();
+				}
+			feeds = facebook.fetchNext(feeds);
+			}
+		}
+	catch(Exception e) {
+			System.err.println("Caught Exception: " + e.getMessage());	
+		}
+    }
+}
