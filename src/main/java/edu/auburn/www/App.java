@@ -94,7 +94,12 @@ public class App {
 				if(jsonObject.has("summary")) {
 					if(jsonObject.getJSONObject("summary").has("total_count"))
 					{
+						if (jsonObject.getJSONObject("summary").isNull("total_count")) { 
+						size = 0;
+						}
+						else {
 						size = jsonObject.getJSONObject("summary").getInt("total_count");	
+						}
 					}
 				}
 				Number number1 = new Number(2, sum, size); 
@@ -114,10 +119,14 @@ public class App {
 				if(jsonObject1.has("summary")) {
 					if(jsonObject1.getJSONObject("summary").has("total_count"))
 					{
+						if (jsonObject1.getJSONObject("summary").isNull("total_count")) { 
+						size = 0;
+						}
+						else {
 						size = jsonObject1.getJSONObject("summary").getInt("total_count");	
+						}
 					}
 				}
-
 				Number number3 = new Number(4, sum, size); 
 				sheet.addCell(number3);
 				
