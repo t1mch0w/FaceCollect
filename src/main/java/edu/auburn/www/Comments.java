@@ -166,8 +166,10 @@ public class Comments {
 			}
 			workbook.write();
 			workbook.close();
+			System.out.println("Successfully finish collecting comments.");
 	
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			workbook.write();
 			workbook.close();
 		}
