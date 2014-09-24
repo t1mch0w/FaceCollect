@@ -1,6 +1,7 @@
 import java.util.Date;
 import java.io.File; 
 import java.util.Date; 
+import java.text.SimpleDateFormat;
 
 import jxl.*; 
 import jxl.write.Number;
@@ -44,8 +45,7 @@ public class Comments {
 		// Get an access token from: 
 		// https://developers.facebook.com/tools/explorer
 		// Copy and paste it below.
-		String accessTokenString =
-"CAACEdEose0cBAAUtztbEcSzUZAxMjSheFbz4LnHfZCL4MQH3cLZAjI5BgvZAeVpHlp7vBszZCfUHQJHpBI2Mut15j6es8ZBmRDmuMWzJ0ZAZAICjrFmSY9ZCcxDWMIyY54vbZALYevnllH2Y04cUvlOO8eiYpWsUae9tg0FNWVFaxEdzSsxHrp1hytZC7T9hDBJ2Omx7j4BrLdDSD6TlYx6teNh";
+		String accessTokenString = "CAACEdEose0cBAFIxIVAzmi4lGOzqYDJl4KZBP2PRRUxZAw7ZAZBh9qZCJ8RGXeJ1hSAlVpwUo3DSab9EpKRYpMA3aZAzjcybXlPUOS3KgqbLsisLF82qWFYJhqQA44KHZBOrDvGzm8LNCWwL83pSXQF2W2dc4HJkQDzCZAa9eHBKLZBnvJPmTVUcFSAZBkRiaGi12PBNDC5pJjUHXUYNT6rXuY";
 		AccessToken at = new AccessToken(accessTokenString);
 		// Set access token.
 		facebook.setOAuthAccessToken(at);
@@ -54,7 +54,14 @@ public class Comments {
 		// Write some stuff to your wall.
 
 //		System.out.println("From " + k + "To " + (k+50));
-		ResponseList<Post> feeds = facebook.getPosts(target, new Reading().limit(100));
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
+		String end_time_str = "01-01-2014 00-00-00";
+		String start_time_str = "01-10-2013 00-00-00";
+		
+		Date start_time = formatter.parse(start_time_str);
+		Date end_time = formatter.parse(end_time_str);
+
+		ResponseList<Post> feeds = facebook.getPosts(target, new Reading().limit(100).since(start_time).until(end_time));
 
 		String xls_file = "comments.xls";
 		File xls = new File(xls_file);
@@ -64,16 +71,25 @@ public class Comments {
 		sheet = workbook.createSheet("First Sheet", 0);
 		
 		sum = 0;		
+		int loop = 1;
 
-		Comment com;
 		Label label1, label2, label3, label4, label5;
 		Number num1;
-		while (feeds!=null) {
+		Comment com;
+		while ((feeds!=null) && (loop == 1)) {
 
 			for (int i = 0; i < feeds.size(); i++) {
 	
-			// Get post.
+				// Get post.
 				Post post = feeds.get(i);
+
+				if (post.getCreatedTime().compareTo(start_time)<0) {
+					loop = 0;
+					break;
+				}
+
+				System.out.println(post.getId());
+
 				//3. # of comments
 	
 				PagableList<Comment> comments = post.getComments();
@@ -97,7 +113,7 @@ public class Comments {
 						label4 = new Label(3, sum, time); 
 						num1 = new Number(4, sum, like_count);
 						label5 = new Label(5, sum, message); 
-	
+
 						sheet.addCell(label1);					
 						sheet.addCell(label2);					
 						sheet.addCell(label3);					
@@ -112,7 +128,7 @@ public class Comments {
 						JSONArray json_reply = jsonObject1.getJSONArray("data");
 						for (int k = 0; k < json_reply.length(); k++) {
 							label1 = new Label(0, sum, postid);
-							label2 = new Label(1, sum, json_reply.getJSONObject(k).getJSONObject("from").getString("id"));
+							label2 = new Label(1, sum, commentid);
 							label3 = new Label(2, sum, json_reply.getJSONObject(k).getJSONObject("from").getString("name"));
 							label4 = new Label(3, sum, json_reply.getJSONObject(k).getString("created_time"));
 							label5 = new Label(5, sum, json_reply.getJSONObject(k).getString("message"));
